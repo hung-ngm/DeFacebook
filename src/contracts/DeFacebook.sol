@@ -76,7 +76,7 @@ contract DeFacebook {
   }
 
   // Tip posts
-  function tipPostCreator(uint _id) public payable {
+  function tipPost(uint _id) public payable {
     require(postsCount > 0 && _id <= postsCount, 'Must exist posts and valid id');
 
     Post memory _post = posts[_id];

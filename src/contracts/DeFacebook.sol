@@ -10,7 +10,6 @@ contract DeFacebook {
 
   struct Post {
     uint id;
-    string hash;
     string title;
     string body;
     uint tipAmount;
@@ -19,7 +18,6 @@ contract DeFacebook {
 
   struct Comment {
     uint id;
-    string hash;
     string body;
     uint tipAmount;
     address payable commenter;
@@ -27,7 +25,6 @@ contract DeFacebook {
 
   event PostCreated(
     uint id,
-    string hash,
     string title,
     string body,
     uint tipAmount,
@@ -36,7 +33,6 @@ contract DeFacebook {
 
   event CommentCreated(
     uint id,
-    string hash,
     string body,
     uint tipAmount,
     address payable commenter
@@ -44,7 +40,6 @@ contract DeFacebook {
 
   event CommentTipped(
     uint id,
-    string hash,
     string body,
     uint tipAmount,
     address payable commenter
@@ -52,7 +47,6 @@ contract DeFacebook {
 
   event PostTipped(
     uint id,
-    string hash,
     string title,
     string body,
     uint tipAmount,
@@ -64,15 +58,14 @@ contract DeFacebook {
   }
 
   // Create posts
-  function createPost(string memory _postHash, string memory _title, string memory _body) public {
-    require(bytes(_postHash).length > 0, 'Post Hash must not be empty');
+  function createPost(string memory _title, string memory _body) public {
     require(bytes(_title).length > 0, 'Title must not be empty');
     require(bytes(_body).length > 0, 'Body must not be empty');
     require(msg.sender != address(0), 'Msg sender must exist');
 
     postsCount ++;
-    posts[postsCount] = Post(postsCount, _postHash, _title, _body, 0, msg.sender);
-    emit PostCreated(postsCount, _postHash, _title, _body, 0, msg.sender);
+    posts[postsCount] = Post(postsCount, _title, _body, 0, msg.sender);
+    emit PostCreated(postsCount, _title, _body, 0, msg.sender);
   }
 
   // Tip posts
@@ -86,18 +79,17 @@ contract DeFacebook {
     _post.tipAmount = _post.tipAmount + msg.value;
     posts[_id] = _post;
 
-    emit PostTipped(_id, _post.hash, _post.title, _post.body, _post.tipAmount, _author);
+    emit PostTipped(_id, _post.title, _post.body, _post.tipAmount, _author);
   }
 
   // Create comments
-  function createComment(string memory _commentHash, string memory _commentBody) public {
-    require(bytes(_commentHash).length > 0, 'Comment Hash must not be empty');
+  function createComment(string memory _commentBody) public {
     require(bytes(_commentBody).length > 0, 'Comment Body must not be empty');
     require(msg.sender != address(0), 'Must exist msg sender');
 
     commentsCount ++;
-    comments[commentsCount] = Comment(commentsCount, _commentHash, _commentBody, 0, msg.sender);
-    emit CommentCreated(commentsCount, _commentHash, _commentBody, 0, msg.sender);
+    comments[commentsCount] = Comment(commentsCount, _commentBody, 0, msg.sender);
+    emit CommentCreated(commentsCount, _commentBody, 0, msg.sender);
   }
 
   // Tip comments
@@ -111,7 +103,7 @@ contract DeFacebook {
     _comment.tipAmount = _comment.tipAmount + msg.value;
     comments[_id] = _comment;
 
-    emit CommentTipped(_id, _comment.hash, _comment.body, _comment.tipAmount, _commenter);
+    emit CommentTipped(_id, _comment.body, _comment.tipAmount, _commenter);
   }
 
 }

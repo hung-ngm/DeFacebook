@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Card, Avatar, TextField, CardActions, CardContent, Button } from '@material-ui/core';
 import { Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -55,8 +55,25 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export const Share = () => {
+export const Share = ({ createPost, account }) => {
   const classes = useStyles();
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
+  }
+
+  const handleBodyChange = (e) => {
+    setBody(e.target.value);
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log(title);
+    console.log(body);
+    createPost(title, body);
+  }
 
   return (
     <Container maxWidth="sm">
@@ -72,11 +89,12 @@ export const Share = () => {
             <Grid container>
               <Grid item sm={1} className={classes.avatar}>
                 <Avatar aria-label="recipe" className={classes.avatar}>
-                  R
+                  {account.toString().slice(0, 3)}
                 </Avatar>
               </Grid>
               <Grid item sm={10} className={classes.titleField}>
                 <TextField
+                onChange={handleTitleChange}
                 id="outlined-basic" 
                 label="Title" 
                 variant="outlined" 
@@ -85,6 +103,7 @@ export const Share = () => {
               </Grid>
               <Grid item sm={12} className={classes.bodyField}>
                 <TextField
+                onChange={handleBodyChange}
                 id="outlined-multiline-static"
                 label="Body"
                 multiline
@@ -97,6 +116,7 @@ export const Share = () => {
           </CardContent>
           <CardActions disableSpacing className={classes.buttonGrid}>
             <Button
+            onClick={handleSubmit}
             variant="contained"
             color="primary"
             size="small"
@@ -105,12 +125,6 @@ export const Share = () => {
               Post
             </Button>
           </CardActions>
-
-          
-          
-          
-          
-          
         </Card>
       </Grid>
     </Container>

@@ -4,19 +4,10 @@ import { Post } from './post/Post';
 import { Share } from './share/Share';
 import Web3 from 'web3';
 import DeFacebook from '../abis/DeFacebook.json';
-import ipfsClient from 'ipfs-http-client';
 
 function App() {
-  // const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' });
 
-  const [post, setPost] = useState({
-    like: 10,
-    date: '27/7/2021',
-    desc: 'Beautiful',
-    photo: '',
-    comment: 'This is very good'
-  });
-
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [account, setAccount] = useState({});
   const [deFacebook, setDeFacebook] = useState({})
@@ -24,12 +15,8 @@ function App() {
 
   useEffect(() => {
     (async function () {
-      try {
-        await loadWeb3();
-        await loadBlockchainData();
-      } catch (err) {
-        console.log(err);
-      }
+      await loadWeb3();
+      await loadBlockchainData();
     })();
   }, []);
 
@@ -50,18 +37,28 @@ function App() {
     const web3 = window.web3;
 
     const accounts = await web3.eth.getAccounts();
-    setAccount({ account: accounts[0]} );
+    setAccount(accounts[0]);
     const networkId = await web3.eth.net.getId();
     const networkData = DeFacebook.networks[networkId];
     if (networkData) {
-      const deFacebook = web3.eth.Contract(DeFacebook.abi, networkData.address);
-      setDeFacebook({ deFacebook });
+      const deFacebook = new web3.eth.Contract(DeFacebook.abi, networkData.address);
+      setDeFacebook(deFacebook);
       const postsCount = await deFacebook.methods.postsCount().call();
-      setPostsCount({ postsCount });
+      setPostsCount(postsCount);
+
+      for(var i = 1; i <= postsCount; i++) {
+        const post = await deFacebook.methods.posts(i).call();
+        console.log(post);
+        setPosts((oldPosts) => [...oldPosts, post]);
+      }
+
+
     } else {
       alert('DeFacebook not connected to network');
     }
   }
+
+
 
   const createPost = (title, body) => {
     setLoading(true);
@@ -80,8 +77,8 @@ function App() {
   return (
     <div className="App">
       <Navbar />
-      <Share />
-      <Post post={post} />
+      <Share createPost={createPost} account={account} />
+      <Post tipPost={tipPost} posts={posts} setPosts={setPosts} />
     </div>
   );
 }
